@@ -1,11 +1,12 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from utils.display import *
-from utils.dsp import *
+from utils_rnn.display import *
+from utils_rnn.dsp import *
 import os
+import ulaw
 
-
+from scipy.io.wavfile import write
 class ResBlock(nn.Module):
     def __init__(self, dims):
         super().__init__()
@@ -208,10 +209,10 @@ class Model(nn.Module):
             output = output[0]
 
         if mu_law :
-            output = decode_mu_law(output, self.n_classes, False)
-
-        save_wav(output, save_path)
-
+            #output = decode_mu_law(output, self.n_classes, False)
+            output = ulaw.ulaw2lin(output)
+        #save_wav(output, save_path)
+        write(save_path, 48000, output)
         self.train()
 
         return output

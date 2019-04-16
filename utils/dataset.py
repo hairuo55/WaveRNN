@@ -6,11 +6,14 @@ import hparams as hp
 
 def get_datasets(path, batch_size=16) :
 
-    with open(f'{path}dataset_ids.pkl', 'rb') as f:
-        dataset_ids = pickle.load(f)
+    with open(f'{path}dataset_train_ids.pkl', 'rb') as f:
+        dataset_train_ids = pickle.load(f)
 
-    test_ids = dataset_ids[-hp.test_samples:]
-    train_ids = dataset_ids[:-hp.test_samples]
+    with open(f'{path}dataset_test_seen_ids.pkl', 'rb') as f:
+        dataset_test_seen_ids = pickle.load(f)
+
+    train_ids = dataset_train_ids
+    test_ids = dataset_test_seen_ids[:10]
 
     train_dataset = AudiobookDataset(train_ids, path)
     test_dataset = AudiobookDataset(test_ids, path)
@@ -66,5 +69,7 @@ def collate(batch):
     x = label_2_float(labels[:, :hp.seq_len].float(), hp.bits)
 
     y = labels[:, 1:]
+
+
 
     return x, y, mels

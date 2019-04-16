@@ -1,14 +1,14 @@
 import time
 from torch import optim
 import torch.nn.functional as F
-from utils.display import stream, simple_table
-from utils.dataset import get_datasets
+from utils_rnn.display import stream, simple_table
+from utils_rnn.dataset import get_datasets
 import hparams as hp
 from models.fatchord_wavernn import Model
 from generate import gen_testset
-from utils.paths import Paths
+from utils_rnn.paths import Paths
 import argparse
-
+import pdb
 parser = argparse.ArgumentParser(description='Train WaveRNN')
 parser.add_argument('--lr', '-l', type=float, default=hp.lr, help='[float] override hparams.py learning rate')
 parser.add_argument('--batch_size', '-b', type=int, default=hp.batch_size, help='[int] override hparams.py batch size')
@@ -70,7 +70,7 @@ model = Model(rnn_dims=hp.rnn_dims,
               bits=hp.bits,
               pad=hp.pad,
               upsample_factors=hp.upsample_factors,
-              feat_dims=hp.num_mels,
+              feat_dims=hp.n_mel_channels,
               compute_dims=hp.compute_dims,
               res_out_dims=hp.res_out_dims,
               res_blocks=hp.res_blocks,
@@ -91,7 +91,6 @@ simple_table([('Steps Left', str((total_steps - model.get_step())//1000) + 'k'),
               ('Batch Size', batch_size),
               ('LR', lr),
               ('Sequence Len', hp.seq_len)])
-
 train_loop(model, optimiser, train_set, test_set, lr, total_steps)
 
 print('Training Complete. To continue training increase total_steps in hparams.py or use --force_train')

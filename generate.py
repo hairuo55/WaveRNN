@@ -1,9 +1,10 @@
-from utils.dataset import get_datasets
-from utils.dsp import *
+from utils_rnn.dataset import get_datasets
+from utils_rnn.dsp import *
 from models.fatchord_wavernn import Model
-from utils.paths import Paths
-from utils.display import simple_table
+from utils_rnn.paths import Paths
+from utils_rnn.display import simple_table
 import argparse
+import hparams_rnn as hp
 
 
 def gen_testset(model, test_set, samples, batched, target, overlap, save_path) :
@@ -46,6 +47,27 @@ def gen_from_file(model, load_path, save_path, batched, target, overlap) :
     _ = model.generate(mel, save_str, batched, target, overlap, hp.mu_law)
 
 
+def gen_from_mel(mel,restore_path,save_path):
+    model = Model(rnn_dims=hp.rnn_dims,
+                 fc_dims=hp.fc_dims,
+                 bits=hp.bits,
+                 pad=hp.pad,
+                 upsample_factors=hp.upsample_factors,
+                 feat_dims=hp.n_mel_channels,
+                 compute_dims=hp.compute_dims,
+                 res_out_dims=hp.res_out_dims,
+                 res_blocks=hp.res_blocks,
+                 hop_length=hp.hop_length,
+                 sample_rate=hp.sample_rate).cuda()
+    model.restore(restore_path)
+    batched = False
+    target = 11000
+    overlap = 550
+    data = model.generate(mel, save_path, batched, target, overlap, hp.mu_law)
+    return data
+
+
+
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description='Generate WaveRNN Samples')
@@ -79,7 +101,7 @@ if __name__ == "__main__":
                   bits=hp.bits,
                   pad=hp.pad,
                   upsample_factors=hp.upsample_factors,
-                  feat_dims=hp.num_mels,
+                  feat_dims=hp.n_mel_channels,
                   compute_dims=hp.compute_dims,
                   res_out_dims=hp.res_out_dims,
                   res_blocks=hp.res_blocks,
