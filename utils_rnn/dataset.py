@@ -1,8 +1,8 @@
 import pickle
 import torch
 from torch.utils.data import Dataset, DataLoader
-from utils.dsp import *
-import hparams as hp
+from utils_rnn.dsp import *
+import hparams_rnn as hp
 
 def get_datasets(path, batch_size=16) :
 

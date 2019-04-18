@@ -1,7 +1,7 @@
 import math
 import numpy as np
 import librosa
-import hparams as hp
+import hparams_rnn as hp
 from scipy.signal import lfilter
 
 
