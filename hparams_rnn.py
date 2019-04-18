@@ -1,7 +1,7 @@
 # CONFIG
 wav_path = '/data/wangtao/data/VCTK/VCTK-Corpus/wav48'
 data_path = 'data_vctk/'
-model_id = '8bit_mulaw'
+model_id = '8bit_mulaw_fmax_8000'
 
 
 # DSP
@@ -11,7 +11,7 @@ hop_length=256
 win_length=1024
 n_mel_channels=80
 mel_fmin=0.0
-mel_fmax=None
+mel_fmax=8000.0
 
 sample_rate = 48000
 #n_fft = 1024
@@ -34,7 +34,7 @@ res_blocks = 10
 
 
 # TRAINING
-batch_size = 128
+batch_size = 144
 lr = 1e-4
 checkpoint_every = 25000
 gen_at_checkpoint = 5           # number of samples to generate at each checkpoint

@@ -5,7 +5,7 @@ from utils_rnn.display import *
 from utils_rnn.dsp import *
 import os
 import ulaw
-
+import pdb
 from scipy.io.wavfile import write
 class ResBlock(nn.Module):
     def __init__(self, dims):
@@ -209,10 +209,11 @@ class Model(nn.Module):
             output = output[0]
 
         if mu_law :
-            #output = decode_mu_law(output, self.n_classes, False)
-            output = ulaw.ulaw2lin(output)
-        #save_wav(output, save_path)
-        write(save_path, 48000, output)
+            output = decode_mu_law(output, self.n_classes, False)
+            #output = ulaw.ulaw2lin(output)
+        save_wav(output, save_path)
+        pdb.set_trace()
+        #write(save_path, 48000, output)
         self.train()
 
         return output

@@ -3,7 +3,7 @@ from torch import optim
 import torch.nn.functional as F
 from utils_rnn.display import stream, simple_table
 from utils_rnn.dataset import get_datasets
-import hparams as hp
+import hparams_rnn as hp
 from models.fatchord_wavernn import Model
 from generate import gen_testset
 from utils_rnn.paths import Paths

@@ -1,7 +1,7 @@
 import glob
 from utils_rnn.display import *
 from utils_rnn.dsp import *
-import hparams as hp
+import hparams_rnn as hp
 from multiprocessing import Pool, cpu_count
 from utils_rnn.paths import Paths
 import pickle
@@ -65,22 +65,24 @@ def convert_file(path) :
 def process_wav(path) :
     id = path.split('/')[-1][:-4]
     m, x = convert_file(path)
-    #np.save(f'{paths.mel}{id}.npy', m)
-    #np.save(f'{paths.quant}{id}.npy', x)
+    np.save(f'{paths.mel}{id}.npy', m)
+    np.save(f'{paths.quant}{id}.npy', x)
     return id
-pdb.set_trace()
-wavs = "/data/wangtao/data/VCTK/VCTK-Corpus/wav48/p238/p238_262.wav"
-mel,quant = convert_file(wavs)
-save_path = "mel_data_1.wav"
-restore_path = "/data/wangtao/wavernn/WaveRNN/checkpoints/8bit_mulaw/checkpoint_100k_steps.pyt"
-#mel = np.load("mel_data.npy")
-mel_torch = torch.from_numpy(mel)
-mel_unsqueeze = torch.unsqueeze(mel_torch,0)
-data = generate.gen_from_mel(mel_unsqueeze,restore_path,save_path)
-print(wavs.split('/')[-1][:-4])
-
 
 if False:
+    pdb.set_trace()
+    wavs = "/data/wangtao/data/VCTK/VCTK-Corpus/wav48/p238/p238_262.wav"
+    mel,quant = convert_file(wavs)
+    save_path = "./gen/mel_data_fmax_8000.wav"
+    restore_path = "/data/wangtao/wavernn/WaveRNN/checkpoints/8bit_mulaw/checkpoint_225k_steps.pyt"
+    #mel = np.load("mel_data.npy")
+    mel_torch = torch.from_numpy(mel)
+    mel_unsqueeze = torch.unsqueeze(mel_torch,0)
+    data = generate.gen_from_mel(mel_unsqueeze,restore_path,save_path)
+    print(wavs.split('/')[-1][:-4])
+
+
+if True:
     wav_files = get_files(path, extension)
     paths = Paths(hp.data_path, hp.model_id)
 

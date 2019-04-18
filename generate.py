@@ -60,7 +60,7 @@ def gen_from_mel(mel,restore_path,save_path):
                  hop_length=hp.hop_length,
                  sample_rate=hp.sample_rate).cuda()
     model.restore(restore_path)
-    batched = False
+    batched = True
     target = 11000
     overlap = 550
     data = model.generate(mel, save_path, batched, target, overlap, hp.mu_law)
