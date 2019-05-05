@@ -40,33 +40,37 @@ stft = TacotronSTFT(filter_length=hp.filter_length,
                          mel_fmin=hp.mel_fmin, mel_fmax=hp.mel_fmax)
 
 def get_mel(audio,stft):
-    audio_norm = audio / MAX_WAV_VALUE
-    audio_norm = audio_norm.unsqueeze(0)
+    #audio_norm = audio / MAX_WAV_VALUE
+    audio_norm = audio.unsqueeze(0)
     audio_norm = torch.autograd.Variable(audio_norm, requires_grad=False)
     melspec = stft.mel_spectrogram(audio_norm)
     melspec = torch.squeeze(melspec, 0)
     return melspec
 
 
+
 def load_wav_to_torch(full_path):
     """
     Loads wavdata into torch array
     """
-    sampling_rate, data = read(full_path)
-    return torch.from_numpy(data).float(), sampling_rate
+    data, sr = librosa.load(full_path, sr=22050)
+    data = np.clip(data,-1,1)
+    #sampling_rate, data = read(full_path)
+    return torch.from_numpy(data).float(), sr
 
-def convert_file(path) :
+def convert_file(path):
     y1,sr = load_wav_to_torch(path)
     mel = get_mel(y1,stft).numpy()
-    quant_u = ulaw.lin2ulaw(y1.numpy())
-    return mel.astype(np.float32), quant_u.astype(np.int16)
+    #y1 = y1 * MAX_WAV_VALUE
+    #quant_u = ulaw.lin2ulaw(y1.numpy())
+    return mel.astype(np.float32)#, quant_u.astype(np.int16)
 
 
 def process_wav(path) :
     id = path.split('/')[-1][:-4]
-    m, x = convert_file(path)
+    m = convert_file(path)
     np.save(f'{paths.mel}{id}.npy', m)
-    np.save(f'{paths.quant}{id}.npy', x)
+    #np.save(f'{paths.quant}{id}.npy', x)
     return id
 
 if False:
@@ -100,7 +104,6 @@ if True:
                       ('Mu Law', hp.mu_law),
                       ('Hop Length', hp.hop_length),
                       ('CPU Count', cpu_count())])
-
         pool = Pool(processes=cpu_count())
         dataset_ids = []
 

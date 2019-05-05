@@ -212,7 +212,6 @@ class Model(nn.Module):
             output = decode_mu_law(output, self.n_classes, False)
             #output = ulaw.ulaw2lin(output)
         save_wav(output, save_path)
-        pdb.set_trace()
         #write(save_path, 48000, output)
         self.train()
 

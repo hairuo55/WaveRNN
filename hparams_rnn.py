@@ -1,11 +1,11 @@
 # CONFIG
-wav_path = '/data/wangtao/data/VCTK/VCTK-Corpus/wav48'
-data_path = 'data_vctk/'
-model_id = '8bit_mulaw_fmax_8000'
+wav_path = '/data/wangtao/data/VCTK/VCTK_DelSil'
+data_path = 'data_vctk/tk_22050_delsil/'
+model_id = '8bit_mulaw_fmax_8000_22050_delsil'
 
 
 # DSP
-sampling_rate=48000
+sampling_rate=22050
 filter_length=1024
 hop_length=256
 win_length=1024
@@ -13,7 +13,7 @@ n_mel_channels=80
 mel_fmin=0.0
 mel_fmax=8000.0
 
-sample_rate = 48000
+sample_rate = 22050
 #n_fft = 1024
 #fft_bins = n_fft // 2 + 1
 #num_mels = 80
@@ -34,9 +34,9 @@ res_blocks = 10
 
 
 # TRAINING
-batch_size = 144
+batch_size = 128
 lr = 1e-4
-checkpoint_every = 25000
+checkpoint_every = 20000
 gen_at_checkpoint = 5           # number of samples to generate at each checkpoint
 total_steps = 500_000           # Total number of training steps
 test_samples = 50               # How many unseen samples to put aside for testing

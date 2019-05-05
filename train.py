@@ -80,7 +80,6 @@ model = Model(rnn_dims=hp.rnn_dims,
 paths = Paths(hp.data_path, hp.model_id)
 
 model.restore(paths.latest_weights)
-
 optimiser = optim.Adam(model.parameters())
 
 train_set, test_set = get_datasets(paths.data, batch_size)

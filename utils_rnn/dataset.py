@@ -41,8 +41,8 @@ class AudiobookDataset(Dataset):
 
     def __getitem__(self, index):
         file = self.metadata[index]
-        m = np.load(f'{self.path}mel/{file}.npy')
-        x = np.load(f'{self.path}quant/{file}.npy')
+        m = np.load(f'{self.path}mel_fmax_8000_22050/{file}.npy')
+        x = np.load(f'{self.path}quant_fmax_8000_22050/{file}.npy')
         return m, x
 
     def __len__(self):
