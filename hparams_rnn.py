@@ -1,7 +1,7 @@
 # CONFIG
 wav_path = '/data/wangtao/data/VCTK/VCTK_DelSil'
 data_path = 'data_vctk/tk_22050_delsil/'
-model_id = '8bit_mulaw_fmax_8000_22050_delsil'
+model_id = '8bit_mulaw_fmax_8000_22050_delsil_restart'
 
 
 # DSP

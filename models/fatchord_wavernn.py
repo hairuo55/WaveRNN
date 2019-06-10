@@ -210,9 +210,10 @@ class Model(nn.Module):
 
         if mu_law :
             output = decode_mu_law(output, self.n_classes, False)
-            #output = ulaw.ulaw2lin(output)
-        save_wav(output, save_path)
-        #write(save_path, 48000, output)
+            #output_1 = (ulaw.ulaw2lin((output+1.0)*255.0/2.0)+0.5).astype('int16')
+            #output = output / 32768.0
+        save_wav(output[:-6000], save_path)
+        #write(save_path, 22050, output_1)
         self.train()
 
         return output
