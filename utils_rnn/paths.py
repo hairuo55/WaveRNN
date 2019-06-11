@@ -8,6 +8,7 @@ class Paths :
         self.mel = f'{data_path}/mel_fmax_8000_22050/'
         self.checkpoints = f'checkpoints/{model_id}/'
         self.latest_weights = f'{self.checkpoints}latest_weights.pyt'
+        #self.latest_weights = ""
         #self.latest_weights = f'/data/wangtao/wavernn/WaveRNN/checkpoints/8bit_mulaw_fmax_8000_22050/checkpoint_300k_steps.pyt'
         self.output = f'model_outputs/{model_id}/'
         self.step = f'{self.checkpoints}/step.npy'

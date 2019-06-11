@@ -1,7 +1,7 @@
 # CONFIG
 wav_path = '/data/wangtao/data/VCTK/VCTK_DelSil'
 data_path = 'data_vctk/tk_22050_delsil/'
-model_id = '8bit_mulaw_fmax_8000_22050_delsil_restart'
+model_id = 'f_loss'
 
 
 # DSP
@@ -20,7 +20,7 @@ sample_rate = 22050
 #fmin = 40
 #min_level_db = -100
 #ref_level_db = 20
-bits = 8                        # bit depth of signal
+bits = 0                        # bit depth of signal
 mu_law = True                   # Recommended to suppress noise
 
 

@@ -3,7 +3,7 @@ import torch
 from torch.utils.data import Dataset, DataLoader
 from utils_rnn.dsp import *
 import hparams_rnn as hp
-
+import pdb
 def get_datasets(path, batch_size=16) :
 
     with open(f'{path}dataset_train_ids.pkl', 'rb') as f:
@@ -65,10 +65,9 @@ def collate(batch):
 
     mels = torch.FloatTensor(mels)
     labels = torch.LongTensor(labels)
-
-    x = label_2_float(labels[:, :hp.seq_len].float(), hp.bits)
-
-    y = labels[:, 1:]
+    x = label_2_float(labels[:, :hp.seq_len].float(), 8)
+    y = x
+   # y = labels[:, 1:]
 
 
 

@@ -8,6 +8,7 @@ from models.fatchord_wavernn import Model
 from generate import gen_testset
 from utils_rnn.paths import Paths
 import argparse
+from f_loss import f_Loss
 import pdb
 parser = argparse.ArgumentParser(description='Train WaveRNN')
 parser.add_argument('--lr', '-l', type=float, default=hp.lr, help='[float] override hparams.py learning rate')
@@ -18,7 +19,7 @@ args = parser.parse_args()
 batch_size = args.batch_size
 force_train = args.force_train
 lr = args.lr
-
+critics = f_Loss()
 
 def train_loop(model, optimiser, train_set, test_set, lr, total_steps):
 
@@ -36,9 +37,8 @@ def train_loop(model, optimiser, train_set, test_set, lr, total_steps):
             x, m, y = x.cuda(), m.cuda(), y.cuda()
 
             y_hat = model(x, m)
-            y_hat = y_hat.transpose(1, 2).unsqueeze(-1)
-            y = y.unsqueeze(-1)
-            loss = F.cross_entropy(y_hat, y)
+            y_hat = y_hat.squeeze(-1)
+            loss = critics((y_hat, y))
 
             optimiser.zero_grad()
             loss.backward()
@@ -52,7 +52,7 @@ def train_loop(model, optimiser, train_set, test_set, lr, total_steps):
             k = step // 1000
 
             if step % hp.checkpoint_every == 0 :
-                gen_testset(model, test_set, hp.gen_at_checkpoint, hp.batched, hp.target, hp.overlap, paths.output)
+                #gen_testset(model, test_set, hp.gen_at_checkpoint, hp.batched, hp.target, hp.overlap, paths.output)
                 model.checkpoint(paths.checkpoints)
 
             msg = f'| Epoch: {e}/{epochs} ({i}/{total_iters}) | Loss: {avg_loss:#.4} | {speed:#.2} steps/s | Step: {k}k | '

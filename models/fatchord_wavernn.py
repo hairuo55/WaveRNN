@@ -138,7 +138,7 @@ class Model(nn.Module):
 
         x = torch.cat([x, a4], dim=2)
         x = F.relu(self.fc2(x))
-        return self.fc3(x)
+        return torch.tanh(self.fc3(x))
 
     def generate(self, mels, save_path, batched, target, overlap, mu_law):
 
