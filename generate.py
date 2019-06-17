@@ -66,6 +66,26 @@ def gen_from_mel(mel,restore_path,save_path):
     data = model.generate(mel, save_path, batched, target, overlap, hp.mu_law)
     return data
 
+def gen_with_x_and_mel(mel,x,restore_path,save_path):
+    model = Model(rnn_dims=hp.rnn_dims,
+                 fc_dims=hp.fc_dims,
+                 bits=hp.bits,
+                 pad=hp.pad,
+                 upsample_factors=hp.upsample_factors,
+                 feat_dims=hp.n_mel_channels,
+                 compute_dims=hp.compute_dims,
+                 res_out_dims=hp.res_out_dims,
+                 res_blocks=hp.res_blocks,
+                 hop_length=hp.hop_length,
+                 sample_rate=hp.sample_rate).cuda()
+    model.restore(restore_path)
+    batched = True
+    target = 11000
+    overlap = 550
+    data = model.test_forward(mel, save_path, batched, target, overlap, hp.mu_law)
+    return data
+
+
 
 
 if __name__ == "__main__":

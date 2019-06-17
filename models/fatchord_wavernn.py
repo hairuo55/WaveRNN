@@ -140,6 +140,44 @@ class Model(nn.Module):
         x = F.relu(self.fc2(x))
         return torch.tanh(self.fc3(x))
 
+
+    def test_forward(self, x, mels) :
+            self.step += 1
+            bsize = x.size(0)
+            h1 = torch.zeros(1, bsize, self.rnn_dims).cuda()
+            h2 = torch.zeros(1, bsize, self.rnn_dims).cuda()
+            mels, aux = self.upsample(mels)
+
+            aux_idx = [self.aux_dims * i for i in range(5)]
+            a1 = aux[:, :, aux_idx[0]:aux_idx[1]]
+            a2 = aux[:, :, aux_idx[1]:aux_idx[2]]
+            a3 = aux[:, :, aux_idx[2]:aux_idx[3]]
+            a4 = aux[:, :, aux_idx[3]:aux_idx[4]]
+
+            x = torch.cat([x.unsqueeze(-1), mels, a1], dim=2)
+            x = self.I(x)
+            res = x
+            x, _ = self.rnn1(x, h1)
+
+            x = x + res
+            res = x
+            x = torch.cat([x, a2], dim=2)
+            x, _ = self.rnn2(x, h2)
+
+            x = x + res
+            x = torch.cat([x, a3], dim=2)
+            x = F.relu(self.fc1(x))
+
+            x = torch.cat([x, a4], dim=2)
+            x = F.relu(self.fc2(x))
+            logits = torch.tanh(self.fc3(x))
+            pdb.set_trace()
+            logits = logits.sequeeze()
+            return logits
+
+
+
+
     def generate(self, mels, save_path, batched, target, overlap, mu_law):
 
         self.eval()
@@ -189,13 +227,14 @@ class Model(nn.Module):
                 x = torch.cat([x, a4_t], dim=1)
                 x = F.relu(self.fc2(x))
 
-                logits = self.fc3(x)
-                posterior = F.softmax(logits, dim=1)
-                distrib = torch.distributions.Categorical(posterior)
+                logits = torch.tanh(self.fc3(x))
 
-                sample = 2 * distrib.sample().float() / (self.n_classes - 1.) - 1.
-                output.append(sample)
-                x = sample.unsqueeze(-1)
+                #posterior = F.softmax(logits, dim=1)
+                #distrib = torch.distributions.Categorical(posterior)
+                #sample = 2 * distrib.sample().float() / (self.n_classes - 1.) - 1.
+
+                output.append(logits.squeeze())
+                x = logits
 
                 if i % 100 == 0 : self.gen_display(i, seq_len, b_size, start)
 
@@ -209,7 +248,7 @@ class Model(nn.Module):
             output = output[0]
 
         if mu_law :
-            output = decode_mu_law(output, self.n_classes, False)
+            output = decode_mu_law(output, 256, False)
             #output_1 = (ulaw.ulaw2lin((output+1.0)*255.0/2.0)+0.5).astype('int16')
             #output = output / 32768.0
         save_wav(output[:-6000], save_path)
