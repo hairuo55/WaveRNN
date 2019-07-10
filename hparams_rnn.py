@@ -45,6 +45,6 @@ seq_len = hop_length * 5        # must be a multiple of hop_length
 
 
 # GENERATING
-batched = True                  # very fast (realtime+) single utterance batched generation
+batched = False                  # very fast (realtime+) single utterance batched generation
 target = 11_000                 # target number of samples to be generated in each batch entry
 overlap = 550                   # number of samples for crossfading between batches

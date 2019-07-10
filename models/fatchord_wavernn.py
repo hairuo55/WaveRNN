@@ -114,6 +114,7 @@ class Model(nn.Module):
         bsize = x.size(0)
         h1 = torch.zeros(1, bsize, self.rnn_dims).cuda()
         h2 = torch.zeros(1, bsize, self.rnn_dims).cuda()
+        pdb.set_trace()
         mels, aux = self.upsample(mels)
 
         aux_idx = [self.aux_dims * i for i in range(5)]
@@ -142,60 +143,59 @@ class Model(nn.Module):
 
 
     def test_forward(self, x, mels) :
-            self.step += 1
-            bsize = x.size(0)
-            h1 = torch.zeros(1, bsize, self.rnn_dims).cuda()
-            h2 = torch.zeros(1, bsize, self.rnn_dims).cuda()
-            mels, aux = self.upsample(mels)
+        self.step += 1
+        bsize = x.size(0)
+        h1 = torch.zeros(1, bsize, self.rnn_dims).cuda()
+        h2 = torch.zeros(1, bsize, self.rnn_dims).cuda()
+        mels, aux = self.upsample(mels)
 
-            aux_idx = [self.aux_dims * i for i in range(5)]
-            a1 = aux[:, :, aux_idx[0]:aux_idx[1]]
-            a2 = aux[:, :, aux_idx[1]:aux_idx[2]]
-            a3 = aux[:, :, aux_idx[2]:aux_idx[3]]
-            a4 = aux[:, :, aux_idx[3]:aux_idx[4]]
+        aux_idx = [self.aux_dims * i for i in range(5)]
+        a1 = aux[:, :, aux_idx[0]:aux_idx[1]]
+        a2 = aux[:, :, aux_idx[1]:aux_idx[2]]
+        a3 = aux[:, :, aux_idx[2]:aux_idx[3]]
+        a4 = aux[:, :, aux_idx[3]:aux_idx[4]]
 
-            x = torch.cat([x.unsqueeze(-1), mels, a1], dim=2)
-            x = self.I(x)
-            res = x
-            x, _ = self.rnn1(x, h1)
+        x = torch.cat([x.unsqueeze(-1), mels, a1], dim=2)
+        x = self.I(x)
+        res = x
+        x, _ = self.rnn1(x, h1)
 
-            x = x + res
-            res = x
-            x = torch.cat([x, a2], dim=2)
-            x, _ = self.rnn2(x, h2)
+        x = x + res
+        res = x
+        x = torch.cat([x, a2], dim=2)
+        x, _ = self.rnn2(x, h2)
 
-            x = x + res
-            x = torch.cat([x, a3], dim=2)
-            x = F.relu(self.fc1(x))
+        x = x + res
+        x = torch.cat([x, a3], dim=2)
+        x = F.relu(self.fc1(x))
 
-            x = torch.cat([x, a4], dim=2)
-            x = F.relu(self.fc2(x))
-            logits = torch.tanh(self.fc3(x))
-            pdb.set_trace()
-            logits = logits.sequeeze()
-            return logits
-
-
+        x = torch.cat([x, a4], dim=2)
+        x = F.relu(self.fc2(x))
+        logits = torch.tanh(self.fc3(x))
+        pdb.set_trace()
+        logits = logits.sequeeze()
+        return logits
 
 
-    def generate(self, mels, save_path, batched, target, overlap, mu_law):
+
+
+    def generate(self, mels, x_real, save_path, batched, target, overlap, mu_law):
 
         self.eval()
         output = []
         start = time.time()
         rnn1 = self.get_gru_cell(self.rnn1)
         rnn2 = self.get_gru_cell(self.rnn2)
-
+        x_real = x_real.cuda()
+        x_real = label_2_float(x_real.float(),8)
         with torch.no_grad():
 
             mels = mels.cuda()
             mels = self.pad_tensor(mels.transpose(1, 2), pad=self.pad, side='both')
             mels, aux = self.upsample(mels.transpose(1, 2))
-
             if batched:
                 mels = self.fold_with_overlap(mels, target, overlap)
                 aux = self.fold_with_overlap(aux, target, overlap)
-
             b_size, seq_len, _ = mels.size()
 
             h1 = torch.zeros(b_size, self.rnn_dims).cuda()
@@ -204,8 +204,7 @@ class Model(nn.Module):
 
             d = self.aux_dims
             aux_split = [aux[:, :, d * i:d * (i + 1)] for i in range(4)]
-
-            for i in range(seq_len):
+            for i in range(84273):
 
                 m_t = mels[:, i, :]
 
@@ -228,16 +227,15 @@ class Model(nn.Module):
                 x = F.relu(self.fc2(x))
 
                 logits = torch.tanh(self.fc3(x))
-
                 #posterior = F.softmax(logits, dim=1)
                 #distrib = torch.distributions.Categorical(posterior)
                 #sample = 2 * distrib.sample().float() / (self.n_classes - 1.) - 1.
 
                 output.append(logits.squeeze())
-                x = logits
+                x = x_real[i].unsqueeze(0).unsqueeze(1)
 
                 if i % 100 == 0 : self.gen_display(i, seq_len, b_size, start)
-
+        pdb.set_trace()
         output = torch.stack(output).transpose(0, 1)
         output = output.cpu().numpy()
         output = output.astype(np.float64)

@@ -10,6 +10,8 @@ from utils_rnn.paths import Paths
 import argparse
 from f_loss import f_Loss
 import pdb
+from utils_rnn.dsp import *
+
 parser = argparse.ArgumentParser(description='Train WaveRNN')
 parser.add_argument('--lr', '-l', type=float, default=hp.lr, help='[float] override hparams.py learning rate')
 parser.add_argument('--batch_size', '-b', type=int, default=hp.batch_size, help='[int] override hparams.py batch size')
@@ -37,6 +39,7 @@ def train_loop(model, optimiser, train_set, test_set, lr, total_steps):
             x, m, y = x.cuda(), m.cuda(), y.cuda()
 
             y_hat = model(x, m)
+            pdb.set_trace()
             y_hat = y_hat.squeeze(-1)
             loss = critics((y_hat, y))
 
@@ -58,7 +61,7 @@ def train_loop(model, optimiser, train_set, test_set, lr, total_steps):
             msg = f'| Epoch: {e}/{epochs} ({i}/{total_iters}) | Loss: {avg_loss:#.4} | {speed:#.2} steps/s | Step: {k}k | '
             stream(msg)
 
-        model.save(paths.latest_weights)
+        #model.save(paths.latest_weights)
         model.log(paths.log, msg)
         print(' ')
 

@@ -47,7 +47,7 @@ def gen_from_file(model, load_path, save_path, batched, target, overlap) :
     _ = model.generate(mel, save_str, batched, target, overlap, hp.mu_law)
 
 
-def gen_from_mel(mel,restore_path,save_path):
+def gen_from_mel(mel,x,restore_path,save_path):
     model = Model(rnn_dims=hp.rnn_dims,
                  fc_dims=hp.fc_dims,
                  bits=hp.bits,
@@ -60,10 +60,10 @@ def gen_from_mel(mel,restore_path,save_path):
                  hop_length=hp.hop_length,
                  sample_rate=hp.sample_rate).cuda()
     model.restore(restore_path)
-    batched = True
+    batched = False
     target = 11000
     overlap = 550
-    data = model.generate(mel, save_path, batched, target, overlap, hp.mu_law)
+    data = model.generate(mel, x,save_path, batched, target, overlap, hp.mu_law)
     return data
 
 def gen_with_x_and_mel(mel,x,restore_path,save_path):
